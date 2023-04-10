@@ -1,0 +1,37 @@
+.table-contents {
+  width: 1119px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  position: relative;
+  top: 100px;
+  left: 80px
+}
+table {
+  width: 100%;
+  height: 100%;
+  }
+    
+th{
+    border-bottom: 1px solid black;
+    background-color: #F6F8FA;
+    height: 32px;
+  }
+
+input {
+  margin-right: 15px;
+  margin-bottom: 2px;
+}
+
+.icon{
+  margin-right: 5px;
+  margin-bottom: 2px;
+}
+
+td {
+  cursor: default;
+}
+
+    

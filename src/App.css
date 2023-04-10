@@ -1,0 +1,63 @@
+.App {
+  text-align: center;
+}
+
+
+
+
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700; 
+  position: relative;
+  top: 70px;
+  left: 80px ;
+  width: 1119px;
+}
+
+p {
+  font-size: 24px;
+  
+}
+
+#create-button {
+  padding: 10px 24px;
+  width: 115px;
+  height: 44px;
+  background: #00A090;
+  border-radius: 50px;
+  color: white;
+  margin-top: 10px;
+}
+
+#create-button:before {
+  content: url('./assets/icons/plus.svg');
+  margin-right: 5px
+}
