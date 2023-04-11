@@ -17,6 +17,14 @@ const App = () => {
   useEffect ( () => {
     setMainData([...firstBox])
     setTopLevelComponents([...firstBox])
+    const flag = firstBox.map((tabledata) => {
+      return {id: tabledata.id , isOpen:false}
+    })
+    const level = firstBox.map(() => 0)
+    const isChecked = firstBox.map((data) => false) 
+    setFlag(flag)
+    setLevel(level)
+    setCheckedItem(isChecked)
     
   },[])
   useEffect( () => {
@@ -24,27 +32,15 @@ const App = () => {
     setDisplayedComponents(mainComponent)
   },[mainData])
 
-  useEffect( () => {
-    const flag = firstBox.map((tabledata) => {
-      return {id: tabledata.id , isOpen:false}
-    })
-    const level = firstBox.map(() => 0)
-    const isChecked = firstBox.map((data) => {
-      return {id: data.id , isCheck:false}
-    }) 
-    setFlag(flag)
-    setLevel(level)
-    setCheckedItem(isChecked)
-    
-  },[])
-
   useEffect ( () => {
     setDisplayedComponents(topLevelComponents)
   },[checkedItem])
+
+
 const onClicked = (event) => {
   if(event.target.firstChild) {
       const id = event.target.firstChild.id;
-      const isFlag = flag.find(fla => fla.id === +id).isOpen
+      const isFlag = flag.find(item => item.id === +id).isOpen
       let component = [];
       let levels = [];
       
@@ -55,9 +51,8 @@ const onClicked = (event) => {
               return recursion(secondBox,parentId)
   
           }else if(data[i].parentId === +id) {
-            console.log("firstBox:",firstBox)
-             const levelss = firstBox.find(datas => datas.id === data[i].parentId) ? 2 : 4             
-              levels.push(levelss)
+             const dataLevels = firstBox.find(datas => datas.id === data[i].parentId) ? 2 : 4             
+              levels.push(dataLevels)
               component.push(data[i])
               const parentId = data[i].id              
               recursion(thirdBox,parentId)
@@ -75,71 +70,144 @@ const onClicked = (event) => {
       if(!isFlag){        
         topLevelComponents.splice(index + 1,0,...component);
         level.splice(index + 1,0,...levels);
-        const subcomp = [...topLevelComponents];
-        const sublevels = [...level]
-        const flags = component.map((item) => {
+        const topLevelComponentsClone = [...topLevelComponents];
+        const levelClone = [...level]
+        const newFlags = component.map((item) => {
           return {id: item.id , isOpen:true}
         })
         flag[index].isOpen = true
-        flag.splice(index + 1 ,0,...flags)
-        const newFlags = flag
-        setFlag(newFlags)
-        setLevel(sublevels)
-        setTopLevelComponents(subcomp)
+        flag.splice(index + 1 ,0,...newFlags)
+        const flagClone = flag
+        setFlag(flagClone)
+        setLevel(levelClone)
+        setTopLevelComponents(topLevelComponentsClone)
         setDisplayedComponents(topLevelComponents)
+        if(checkedItem[index]){
+          onClickedChecked(id)
+        } else {
+          console.log("checked: ",checkedItem)
+          console.log("length",component.length)
+          const checks = component.map(() => false )
+          checkedItem.splice(index+1,0,...checks )
+        }
       } else {
         const completeComponent = component.filter((item,index) => component.indexOf(item) === index); // avoid duplicate items
-        console.log("🚀 ~ file: App.js:84 ~ onChecked ~ completeComponent:", completeComponent)
         const componentLength = completeComponent.filter(item => topLevelComponents.includes(item) ).length
-        console.log("🚀 ~ file: App.js:87 ~ onChecked ~ componentLen:", componentLength)
-
         topLevelComponents.splice(index + 1,componentLength);
         level.splice(index + 1,componentLength);
-        const subcomp = [...topLevelComponents];
-        const sublevels = [...level]
+        const topLevelComponentsClone = [...topLevelComponents];
+        const levelClone = [...level]
         flag.splice(index + 1, componentLength)
         flag[index].isOpen = false
-        const newFlags = flag
-        setFlag(newFlags)
-        setLevel(sublevels)
-        setTopLevelComponents(subcomp)
+        const flagClone = flag
+        setFlag(flagClone)
+        setLevel(levelClone)
+        setTopLevelComponents(topLevelComponentsClone)
         setDisplayedComponents(topLevelComponents)
-      }
-      // onChecked()
-      console.log("component: ",component)
-      console.log("topLevelComponents: ",topLevelComponents)
-      console.log("level:",level)
-    }
-
-  }
-
-  const onChecked = (event,data) => {
-    console.log("🚀 ~ file: App.js:117 ~ onChecked ~ data:", data)
-    console.log("event.target.id",event.target.id)
-    const id = event.target.id ||event.target.firstChild.id
-    // const isChecked = checkedItem.find( item => item.id === +id )
-    console.log("🚀 ~ file: App.js:118 ~ onChecked ~ isChecked:", checkedItem)
-    const checked = []
-    const recursion = (data,id) => {
-      for (let i =0 ; i< data.length; i++) {
-        if(data[i].parentId === +id) {
-          checked.push({id: data.id , isCheck:true})
-          const id = data[i].id
-          recursion(data,id)
+        if(checkedItem[index]) {
+          onUnclickedChecked(index,componentLength)
+        }else {
+          console.log("checked: ",checkedItem)
+          console.log("length",componentLength)
+          checkedItem.splice(index+1,componentLength)
         }
         
       }
     }
 
-    recursion(topLevelComponents,id)
+  }
+
+  const onClickedChecked = (id) => {
+
+    const checked = []
+
+    const checkRecursion = (data,id) => {
+      for (let i =0 ; i< data.length; i++) {
+        if(data[i].parentId === +id) {
+          checked.push(true)
+          const id = data[i].id
+          checkRecursion(data,id)
+        }
+        
+      }
+    }
+
     const item = topLevelComponents.find(data => data.id === +id)
     const index = topLevelComponents.indexOf(item) ;
-    console.log("🚀 ~ file: App.js:128 ~ onChecked ~ index:", index)
-    checkedItem[index].isCheck = true
-    checkedItem.splice(index + 1,0,...checked)
-    const checks = [...checkedItem]
-    console.log("🚀 ~ file: App.js:131 ~ onChecked ~ checks:", checks)
-    setCheckedItem(checks)
+
+    checkRecursion(topLevelComponents,id)
+    if(topLevelComponents.length === checkedItem.length) {
+      console.log("index: ",index)
+      console.log("checked.length: ",checked.length)
+      console.log("checked: ",checked)
+      checkedItem.splice(index + 1, checked.length, ...checked)
+      console.log("checkedItemsss:",checkedItem)
+    } else {
+      checkedItem.splice(index + 1,0,...checked)
+    }
+    
+    const checkedItemClone = [...checkedItem]
+    setCheckedItem(checkedItemClone)
+  }
+
+  const onUnclickedChecked = (index,componentLength) => {
+    checkedItem.splice(index+1,componentLength)
+    console.log("🚀 ~ file: App.js:154 ~ onUnclickedChecked ~ checkedItem:", checkedItem)
+    const checkedItemClone = [...checkedItem]
+    console.log("checkedItemClone: ",checkedItemClone)
+    setCheckedItem(checkedItemClone)
+  } 
+
+  const onChecked = (event) => {
+    
+    const id = event.target.id    
+    const checked = []
+    const checkRecursion = (data,id) => {
+      for (let i =0 ; i< data.length; i++) {
+        if(data[i].parentId === +id) {
+          checked.push(true)
+          const id = data[i].id
+          checkRecursion(data,id)
+        }
+        
+      }
+    }
+
+    const uncheckRecursion = (data,id) => {
+      for (let i =0 ; i< data.length; i++) {
+        if(data[i].parentId === +id) {
+          checked.push(false)
+          const id = data[i].id
+          uncheckRecursion(data,id)
+        }
+        
+      }
+    }
+
+    
+    const item = topLevelComponents.find(data => data.id === +id)
+    const index = topLevelComponents.indexOf(item) ;
+    const isChecked = checkedItem[index]
+    if(!isChecked){
+      checkRecursion(topLevelComponents,id)
+      checkedItem[index] = true
+      if(topLevelComponents.length === checkedItem.length) {
+        checkedItem.splice(index + 1, checked.length, ...checked)
+      } else {
+        checkedItem.splice(index + 1,0,...checked)
+      }
+      console.log("onchechecked!ischeked",checkedItem)
+      const checkedItemClone = [...checkedItem]
+      setCheckedItem(checkedItemClone)
+    }else { 
+      uncheckRecursion(topLevelComponents,id)
+      checkedItem[index] = false;
+      const uncheckedLength = checked.length
+      checkedItem.splice(index + 1, +uncheckedLength, ...checked)
+      const checkedItemClone = [...checkedItem]
+      setCheckedItem(checkedItemClone)
+    }
+
   }
   
 
