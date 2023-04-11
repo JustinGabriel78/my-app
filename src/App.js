@@ -85,8 +85,6 @@ const onClicked = (event) => {
         if(checkedItem[index]){
           onClickedChecked(id)
         } else {
-          console.log("checked: ",checkedItem)
-          console.log("length",component.length)
           const checks = component.map(() => false )
           checkedItem.splice(index+1,0,...checks )
         }
@@ -107,8 +105,6 @@ const onClicked = (event) => {
         if(checkedItem[index]) {
           onUnclickedChecked(index,componentLength)
         }else {
-          console.log("checked: ",checkedItem)
-          console.log("length",componentLength)
           checkedItem.splice(index+1,componentLength)
         }
         
@@ -137,11 +133,7 @@ const onClicked = (event) => {
 
     checkRecursion(topLevelComponents,id)
     if(topLevelComponents.length === checkedItem.length) {
-      console.log("index: ",index)
-      console.log("checked.length: ",checked.length)
-      console.log("checked: ",checked)
       checkedItem.splice(index + 1, checked.length, ...checked)
-      console.log("checkedItemsss:",checkedItem)
     } else {
       checkedItem.splice(index + 1,0,...checked)
     }
@@ -152,9 +144,7 @@ const onClicked = (event) => {
 
   const onUnclickedChecked = (index,componentLength) => {
     checkedItem.splice(index+1,componentLength)
-    console.log("🚀 ~ file: App.js:154 ~ onUnclickedChecked ~ checkedItem:", checkedItem)
     const checkedItemClone = [...checkedItem]
-    console.log("checkedItemClone: ",checkedItemClone)
     setCheckedItem(checkedItemClone)
   } 
 
@@ -196,7 +186,6 @@ const onClicked = (event) => {
       } else {
         checkedItem.splice(index + 1,0,...checked)
       }
-      console.log("onchechecked!ischeked",checkedItem)
       const checkedItemClone = [...checkedItem]
       setCheckedItem(checkedItemClone)
     }else { 
