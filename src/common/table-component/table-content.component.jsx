@@ -12,25 +12,15 @@ const TableComponent = ({data, onClicked, level, onChecked, checkedItem}) => {
                 <th>ACCOUNT GROUP</th>
                 <th>CLOSING BALANCE</th>
             </tr>
-            {data.map((val, key) => {
-              if(val.type === 1) {
-                return (
+            {data.map((val, key) => 
                   <tr key={key}>
-                    <td onClick = {onClicked} ><input type="checkbox" name="myTextEditBox"   id = {val.id} onChange={onChecked} checked={checkedItem[key]}/><img className='icon' src={Vector}  style = {{ marginLeft : level[key] * 10  }} />{ val.name}</td>
+                    <td onClick = {onClicked} ><input type="checkbox" name="myTextEditBox"   id = {val.id} onChange={onChecked} checked={checkedItem[key]}/><img className='icon' src={val.type===1 ? Vector: Shape}  style = {{ marginLeft : level[key] * 10  }} />{ val.name}</td>
                     <td>Account type</td>
                     <td>Account Group</td>
                     <td>--</td>
                   </tr>
-              )} else {
-                return (
-                <tr key={key}>
-                <td onClick = {onClicked}><input type="checkbox" name="myTextEditBox" id = {val.id} onChange={onChecked} checked={checkedItem[key]}/><img className='icon' src={Shape} style = {{ marginLeft : level[key] * 10  }}/>{ val.name}</td>
-                <td>Account type</td>
-                <td>Account Group</td>
-                <td>--</td>
-              </tr>
+               
             )}
-          })}
         </table>
         </div>
     )
