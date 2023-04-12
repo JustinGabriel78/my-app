@@ -12,14 +12,15 @@ const ChartOfAccounts = () => {
   const [level, setLevel] = useState([]);
 
   useEffect(() => {
+    const flag = firstBox.map((tabledata) => ({id: tabledata.id , isOpen:false}))
     const level = firstBox.map(() => 0);
-    const FlagAndIsChecked = firstBox.map(() => false);
+    const IsChecked = firstBox.map(() => false);
 
     setMainData([...firstBox])
     setTopLevelComponents([...firstBox]);
-    setFlag(FlagAndIsChecked);
+    setFlag(flag);
     setLevel(level);
-    setCheckedItem(FlagAndIsChecked);
+    setCheckedItem(IsChecked);
   }, []);
 
   useEffect(() => {
@@ -31,15 +32,26 @@ const ChartOfAccounts = () => {
     setDisplayedComponents(topLevelComponents);
   }, [checkedItem]);
 
+
+  /**
+   * Function which is called when clicking the table item
+   * @param {*} event 
+   */
   const onClicked = (event) => {
     if (event.target.firstChild) {
       const id = event.target.firstChild.id;
-      let component = [];
-      let levels = [];
+      const component = [];
+      const levels = [];
       const item = topLevelComponents.find((data) => data.id === +id);
       const index = topLevelComponents.indexOf(item);
-      const isFlag = flag[index]
+      const isFlag = flag.find(item => item.id === +id).isOpen
 
+      /**
+       * Function used to find the children of the corresponding data
+       * @param {array} data 
+       * @param {Integer} id 
+       * @returns 
+       */
       const recursion = (data, id) => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].id === +id && data[i].parentId === null) {
@@ -58,6 +70,13 @@ const ChartOfAccounts = () => {
         }
       };
 
+
+      /**
+       * Function used to set the state
+       * @param {array} topLevelComponents 
+       * @param {Integer} level 
+       * @param {Boolean} flag 
+       */
       const setState = (topLevelComponents, level, flag) => {
         const topLevelComponentsClone = [...topLevelComponents];
         const levelClone = [...level];
@@ -72,7 +91,7 @@ const ChartOfAccounts = () => {
 
       if (!isFlag) {
         const newFlags = component.map(() => true )
-        flag[index] = true
+        flag[index].isOpen = true
         flag.splice(index + 1, 0, ...newFlags);
         topLevelComponents.splice(index + 1, 0, ...component);
         level.splice(index + 1, 0, ...levels);
@@ -88,7 +107,7 @@ const ChartOfAccounts = () => {
       } else {
         const completeComponent = component.filter((item, index) => component.indexOf(item) === index); // avoid duplicate items
         const componentLength = completeComponent.filter((item) =>topLevelComponents.includes(item)).length;
-        flag[index] = false
+        flag[index].isOpen = false
         topLevelComponents.splice(index + 1, componentLength);
         level.splice(index + 1, componentLength);
         flag.splice(index + 1, componentLength);
@@ -104,10 +123,14 @@ const ChartOfAccounts = () => {
     }
   };
 
+  /**
+   * Function is called when the clickbox is already checked and then clicks the corresponding table data 
+   * @param {Integer} id - id of the corresponding table data
+   */
   const onCheckedClicked = (id) => {
     const item = topLevelComponents.find((data) => data.id === +id);
     const index = topLevelComponents.indexOf(item);
-    const checked = CheckedAndUncheckedDuringRecursion(topLevelComponents, id ,true);
+    const checked = CheckedAndUnchecked(topLevelComponents, id ,true);
 
     if (topLevelComponents.length === checkedItem.length) {
       checkedItem.splice(index + 1, checked.length, ...checked);
@@ -119,6 +142,11 @@ const ChartOfAccounts = () => {
     setCheckedItem(checkedItemClone);
   };
 
+  /**
+   * Function is called when the clickbox is already checked and then unclicks the corresponding table data 
+   * @param {Integer} index - Index of the corresponding table data
+   * @param {Integer} componentLength - Length of the children data of the clicked table data 
+   */
   const onCheckedUnclicked = (index, componentLength) => {
     checkedItem.splice(index + 1, componentLength);
     const checkedItemClone = [...checkedItem];
@@ -127,23 +155,39 @@ const ChartOfAccounts = () => {
 
   const checked =[];
 
-  const CheckedAndUncheckedDuringRecursion  = (data, id, checkedStatus) => {
+  /**
+   * Function to mark checked and Unchecked
+   * @param {array} data - Data that pass to the recursion
+   * @param {Integer} id - Id of the corresponding table data
+   * @param {Boolean} checkedStatus - If the checkbox corresponding to the table data is checked or not
+   * @returns {Array} 
+   */
+  const CheckedAndUnchecked  = (data, id, checkedStatus) => {
     for (let i = 0; i < data.length; i++) {
       if (data[i].parentId === +id) {
         checked.push(checkedStatus);
         const id = data[i].id;
-        CheckedAndUncheckedDuringRecursion(data, id,checkedStatus);
+        CheckedAndUnchecked(data, id,checkedStatus);
       }
     }
     return checked
   };
 
+
+  /**
+   * Function is called when checking and unchecking the checkbox
+   * @param {*} event 
+   */
   const onChecked = (event) => {
     const id = event.target.id;
     const item = topLevelComponents.find((data) => data.id === +id);
     const index = topLevelComponents.indexOf(item);
     const isChecked = checkedItem[index];
 
+    /**
+     * Function used to set the state of checkedItem
+     * @param {Boolean} checkedStatus 
+     */
     const settingCheckedItem = (checkedStatus) => {
       checkedItem[index] = checkedStatus;
       const checkedItemClone = [...checkedItem];
@@ -151,7 +195,7 @@ const ChartOfAccounts = () => {
     }
 
     if (!isChecked) {
-      const checked = CheckedAndUncheckedDuringRecursion(topLevelComponents, id,true);
+      const checked = CheckedAndUnchecked(topLevelComponents, id,true);
       if (topLevelComponents.length === checkedItem.length) {
         checkedItem.splice(index + 1, checked.length, ...checked);
       } else {
@@ -159,7 +203,7 @@ const ChartOfAccounts = () => {
       }
       settingCheckedItem(true)
     } else {
-      const checked = CheckedAndUncheckedDuringRecursion(topLevelComponents, id,false);
+      const checked = CheckedAndUnchecked(topLevelComponents, id,false);
       const uncheckedLength = checked.length;
       checkedItem.splice(index + 1, +uncheckedLength, ...checked);
       settingCheckedItem(false)
@@ -182,75 +226,6 @@ const ChartOfAccounts = () => {
     </div>
   );
 };
-
-// import { useEffect, useState, useCallback } from "react";
-// import "./ChartOfAccounts.css";
-// import TableComponent from "../../common/table-component/table-content.component";
-// import { firstBox, secondBox, thirdBox } from "../../data";
-
-// const ChartOfAccounts = () => {
-//   const [mainData, setMainData] = useState([]);
-//   const [topLevelComponents, setTopLevelComponents] = useState([]);
-//   const [displayedComponents, setDisplayedComponents] = useState([]);
-//   const [checkedItem, setCheckedItem] = useState([]);
-//   const [flag, setFlag] = useState([]);
-//   const [level, setLevel] = useState([]);
-
-//   const dataMap = {};
-
-//   const handleClick = useCallback(
-//     (id) => {
-//       const item = dataMap[id];
-//       const index = topLevelComponents.indexOf(item);
-//       const isFlag = flag[index];
-
-//       const { component, levels } = getSubtree(topLevelComponents, id);
-
-//       if (!isFlag) {
-//         const newFlags = component.map(() => true);
-//         flag[index] = true;
-//         flag.splice(index + 1, 0, ...newFlags);
-//         topLevelComponents.splice(index + 1, 0, ...component);
-//         level.splice(index + 1, 0, ...levels);
-
-//         if (checkedItem[index]) {
-//           handleCheck(id, false);
-//         } else {
-//           const checks = component.map(() => false);
-//           checkedItem.splice(index + 1, 0, ...checks);
-//         }
-//       } else {
-//         const completeComponent = component.filter(
-//           (item, index) => component.indexOf(item) === index
-//         );
-//         const componentLength = completeComponent.filter((item) =>
-//           topLevelComponents.includes(item)
-//         ).length;
-//         flag[index] = false;
-//         topLevelComponents.splice(index + 1, componentLength);
-//         level.splice(index + 1, componentLength);
-//         flag.splice(index + 1, componentLength);
-
-//         if (checkedItem[index]) {
-//           handleCheck(id, false);
-//         } else {
-//           checkedItem.splice(index + 1, componentLength);
-//         }
-//       }
-
-//       setCheckedItem([...checkedItem]);
-//       setFlag([...flag]);
-//       setLevel([...level]);
-//       setTopLevelComponents([...topLevelComponents]);
-//       setDisplayedComponents(topLevelComponents);
-//     },
-//     [checkedItem, dataMap, flag, level, topLevelComponents]
-//   );
-
-// }
-
-
-
 
  export default ChartOfAccounts;
 
