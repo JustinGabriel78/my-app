@@ -115,7 +115,6 @@ const ChartOfAccounts = () => {
     const onClickedChecked = (id) => {
   
       const checked = []
-  
       const checkRecursion = (data,id) => {
         for (let i =0 ; i< data.length; i++) {
           if(data[i].parentId === +id) {
