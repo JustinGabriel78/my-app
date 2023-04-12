@@ -38,7 +38,5 @@ const TableComponent = ({data, onClicked, level, onChecked, checkedItem}) => {
 
 export default TableComponent
 
-// checked={checkedItem.includes(val.id)}
-// 
 
 

@@ -1,0 +1,31 @@
+.head {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700; 
+    position: relative;
+    top: 70px;
+    left: 80px ;
+    width: 1119px;
+  }
+  
+  p {
+    font-size: 24px;
+    
+  }
+  
+  #create-button {
+    padding: 10px 24px;
+    width: 115px;
+    height: 44px;
+    background: #00A090;
+    border-radius: 50px;
+    color: white;
+    margin-top: 10px;
+  }
+  
+  #create-button:before {
+    content: url('../../assets/icons/plus.svg');
+    margin-right: 5px
+  }
