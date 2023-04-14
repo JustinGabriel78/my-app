@@ -45,24 +45,29 @@ const ChartOfAccounts = () => {
       const item = topLevelComponents.find((data) => data.id === +id);
       const index = topLevelComponents.indexOf(item);
       const isFlag = flag.find(item => item.id === +id).isOpen
-
       /**
        * Function used to find the children of the corresponding data
        * @param {array} data 
        * @param {Integer} id 
        * @returns 
        */
+
+      let treeFlag = false;
       const recursion = (data, id) => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].id === +id && data[i].parentId === null) {
             const parentId = data[i].id;
+            treeFlag = !treeFlag
             return recursion(secondBox, parentId);
           } else if (data[i].parentId === +id) {
             const dataLevels = firstBox.find((datas) => datas.id === data[i].parentId)? 2: 4;
             levels.push(dataLevels);
             component.push(data[i]);
             const parentId = data[i].id;
-            recursion(thirdBox, parentId);
+            if(!treeFlag){
+              recursion(thirdBox, parentId);
+            }
+            
           } else if (data[i].id === +id && data[i].type === 0) {
             const parentId = data[i].id;
             recursion(thirdBox, parentId);
@@ -84,13 +89,13 @@ const ChartOfAccounts = () => {
         setFlag(flagClone);
         setLevel(levelClone);
         setTopLevelComponents(topLevelComponentsClone);
-        setDisplayedComponents(topLevelComponents);
+        setDisplayedComponents(topLevelComponents); 
       };
 
       recursion(topLevelComponents, id);
 
       if (!isFlag) {
-        const newFlags = component.map(() => true )
+        const newFlags = component.map((tabledata) => ({id: tabledata.id , isOpen:false}) )
         flag[index].isOpen = true
         flag.splice(index + 1, 0, ...newFlags);
         topLevelComponents.splice(index + 1, 0, ...component);
@@ -105,17 +110,25 @@ const ChartOfAccounts = () => {
         setState(topLevelComponents, level, flag);
 
       } else {
+        let top = [...topLevelComponents]
+        console.log("toplevel: ",top)
+        console.log("component",component)
+
         const completeComponent = component.filter((item, index) => component.indexOf(item) === index); // avoid duplicate items
+
+        const parentIds = new Set(completeComponent.map(component => component.id));
+        const subComponentLength = topLevelComponents.filter(component => parentIds.has(component.parentId)).length;
         const componentLength = completeComponent.filter((item) =>topLevelComponents.includes(item)).length;
+        const totalcomponentLength = componentLength + subComponentLength
         flag[index].isOpen = false
-        topLevelComponents.splice(index + 1, componentLength);
-        level.splice(index + 1, componentLength);
-        flag.splice(index + 1, componentLength);
+        topLevelComponents.splice(index + 1, totalcomponentLength);
+        level.splice(index + 1, totalcomponentLength);
+        flag.splice(index + 1, totalcomponentLength);
 
         if (checkedItem[index]) {
-          onCheckedUnclicked(index, componentLength);
+          onCheckedUnclicked(index, totalcomponentLength);
         } else {
-          checkedItem.splice(index + 1, componentLength);
+          checkedItem.splice(index + 1, totalcomponentLength  );
         }
         setState(topLevelComponents, level, flag);
 
@@ -160,7 +173,7 @@ const ChartOfAccounts = () => {
    * @param {array} data - Data that pass to the recursion
    * @param {Integer} id - Id of the corresponding table data
    * @param {Boolean} checkedStatus - If the checkbox corresponding to the table data is checked or not
-   * @returns {Array} 
+   * @returns 
    */
   const CheckedAndUnchecked  = (data, id, checkedStatus) => {
     for (let i = 0; i < data.length; i++) {
@@ -185,7 +198,7 @@ const ChartOfAccounts = () => {
     const isChecked = checkedItem[index];
 
     /**
-     * Function used to set the state of checkedItem
+     * 
      * @param {Boolean} checkedStatus 
      */
     const settingCheckedItem = (checkedStatus) => {
